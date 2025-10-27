@@ -84,13 +84,41 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // 1. Найти подходящего механика по специализации услуги
+    let mechanic = null;
+    // Получаем специализацию услуги
+    const serviceRes = await pool.query('SELECT name FROM service_types WHERE service_type_id = ?', [service_type_id]);
+    const service = serviceRes.rows && serviceRes.rows[0] ? serviceRes.rows[0] : null;
+    if (service) {
+      // Ищем механика по специализации
+      const mechRes = await pool.query(
+        'SELECT * FROM mechanics WHERE specialization LIKE ? ORDER BY mechanic_id ASC',
+        [`%${service.name}%`]
+      );
+      if (mechRes.rows && mechRes.rows.length > 0) {
+        mechanic = mechRes.rows[0];
+      }
+    }
+    // Если не нашли по специализации, берем любого
+    if (!mechanic) {
+      const anyMechRes = await pool.query('SELECT * FROM mechanics ORDER BY mechanic_id ASC');
+      if (anyMechRes.rows && anyMechRes.rows.length > 0) {
+        mechanic = anyMechRes.rows[0];
+      }
+    }
+    const mechanic_id = mechanic ? mechanic.mechanic_id : null;
+
+    // 2. Создаем бронирование с mechanic_id
     const result = await pool.query(
-      `INSERT INTO bookings (customer_id, vehicle_id, service_type_id, booking_date, booking_time, notes, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'scheduled') RETURNING *`,
-      [customer_id, vehicle_id, service_type_id, booking_date, booking_time, notes]
+      `INSERT INTO bookings (customer_id, vehicle_id, service_type_id, mechanic_id, booking_date, booking_time, notes, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled')`,
+      [customer_id, vehicle_id, service_type_id, mechanic_id, booking_date, booking_time, notes]
     );
 
-    res.status(201).json(result.rows[0]);
+    // Получаем только что созданную запись
+    const bookingId = result.lastID;
+    const bookingRes = await pool.query('SELECT * FROM bookings WHERE booking_id = ?', [bookingId]);
+    res.status(201).json(bookingRes.rows[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
@@ -136,24 +164,47 @@ router.put('/:id/status', async (req, res) => {
       return res.status(400).json({ error: 'Status is required' });
     }
 
-    let query = `UPDATE bookings SET status = $1, updated_at = CURRENT_TIMESTAMP`;
+    let query = `UPDATE bookings SET status = ?, updated_at = CURRENT_TIMESTAMP`;
     const params = [status];
 
     if (status === 'completed' && actual_completion) {
       params.push(actual_completion);
-      query += `, actual_completion = $${params.length}`;
+      query += `, actual_completion = ?`;
     }
 
     params.push(id);
-    query += ` WHERE booking_id = $${params.length} RETURNING *`;
+    query += ` WHERE booking_id = ?`;
 
-    const result = await pool.query(query, params);
+    await pool.query(query, params);
 
-    if (result.rows.length === 0) {
+    // Получаем обновленное бронирование
+    const bookingRes = await pool.query('SELECT * FROM bookings WHERE booking_id = ?', [id]);
+    if (!bookingRes.rows || bookingRes.rows.length === 0) {
       return res.status(404).json({ error: 'Booking not found' });
     }
+    const booking = bookingRes.rows[0];
 
-    res.json(result.rows[0]);
+    // Если статус стал completed — создаём invoice, если его ещё нет
+    if (status === 'completed') {
+      // Проверяем, есть ли уже invoice для этого бронирования
+      const invRes = await pool.query('SELECT * FROM invoices WHERE booking_id = ?', [id]);
+      if (!invRes.rows || invRes.rows.length === 0) {
+        // Получаем цену услуги
+        const serviceRes = await pool.query('SELECT base_price FROM service_types WHERE service_type_id = ?', [booking.service_type_id]);
+        const base_price = serviceRes.rows && serviceRes.rows[0] ? serviceRes.rows[0].base_price : 0;
+        const tax = Math.round(base_price * 0.1 * 100) / 100; // 10% налог
+        const total = Math.round((base_price + tax) * 100) / 100;
+        const invoice_number = `INV-${Date.now()}-${id}`;
+        await pool.query(
+          `INSERT INTO invoices (booking_id, customer_id, invoice_number, subtotal, tax, total, payment_status, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, 'pending', datetime('now'), datetime('now'))`,
+          [id, booking.customer_id, invoice_number, base_price, tax, total]
+        );
+      }
+    }
+
+    // Возвращаем обновленное бронирование
+    res.json(booking);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });
