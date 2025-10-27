@@ -1,0 +1,77 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../services/api';
+
+function MechanicLogin({ onLogin }) {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await api.post('/mechanics/login', formData);
+      onLogin(response.data.mechanic, response.data.token, 'mechanic');
+      navigate('/mechanic-dashboard');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="card" style={{ maxWidth: '400px', margin: '100px auto' }}>
+      <h2>🔧 Mechanic Login</h2>
+      {error && <div className="alert alert-error">{error}</div>}
+      
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%' }}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+
+      <p style={{ marginTop: '20px', textAlign: 'center' }}>
+        First time? <Link to="/mechanic-setup">Set up your password</Link>
+      </p>
+      <p style={{ textAlign: 'center' }}>
+        <Link to="/login">Customer Login</Link>
+      </p>
+    </div>
+  );
+}
+
+export default MechanicLogin;
