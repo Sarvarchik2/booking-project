@@ -4,6 +4,18 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+// Ensure JWT secret is set. In production this must be provided via environment.
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('FATAL: JWT_SECRET environment variable is required in production');
+    process.exit(1);
+  } else {
+    // Development fallback — change this for your local environment if needed.
+    process.env.JWT_SECRET = 'dev_jwt_secret_change_this';
+    console.warn('Warning: JWT_SECRET not set. Using development fallback. Do NOT use this in production.');
+  }
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -45,8 +57,9 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  const actualPort = server.address().port;
+  console.log(`Server is running on port ${actualPort}`);
 });
 
 module.exports = app;
