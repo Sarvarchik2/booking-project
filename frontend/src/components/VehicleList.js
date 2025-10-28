@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
 function VehicleList({ customerId }) {
@@ -16,11 +16,7 @@ function VehicleList({ customerId }) {
   });
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchVehicles();
-  }, [customerId]);
-
-  const fetchVehicles = async () => {
+  const fetchVehicles = useCallback(async () => {
     try {
       const response = await api.get(`/vehicles/customer/${customerId}`);
       setVehicles(response.data);
@@ -29,7 +25,11 @@ function VehicleList({ customerId }) {
       console.error('Error fetching vehicles:', error);
       setLoading(false);
     }
-  };
+  }, [customerId]);
+
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

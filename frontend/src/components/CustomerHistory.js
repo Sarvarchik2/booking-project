@@ -11,19 +11,19 @@ function CustomerHistory({ customerId }) {
   const [activeTab, setActiveTab] = useState('bookings');
 
   useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await api.get(`/customers/${customerId}/history`);
+        setHistory(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching history:', error);
+        setLoading(false);
+      }
+    };
+
     fetchHistory();
   }, [customerId]);
-
-  const fetchHistory = async () => {
-    try {
-      const response = await api.get(`/customers/${customerId}/history`);
-      setHistory(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching history:', error);
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return <div className="loading">Loading history...</div>;

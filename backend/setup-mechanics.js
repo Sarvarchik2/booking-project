@@ -4,7 +4,7 @@ const db = require('./config/database');
 async function setupMechanicPasswords() {
   console.log('Setting up default passwords for mechanics...');
 
-  const defaultPassword = 'mechanic123'; // Default password for all mechanics
+  const defaultPassword = 'sarvar'; 
   const salt = await bcrypt.genSalt(10);
   const password_hash = await bcrypt.hash(defaultPassword, salt);
 
@@ -23,7 +23,6 @@ async function setupMechanicPasswords() {
       console.log('---');
     });
 
-    // If sqlite, close DB connection
     if (db.db && typeof db.db.close === 'function') {
       db.db.close();
     } else if (db.pool && typeof db.pool.end === 'function') {

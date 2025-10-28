@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
@@ -8,23 +8,15 @@ function BookingList({ customerId }) {
   const [filter, setFilter] = useState('all');
   const [feedbackStatus, setFeedbackStatus] = useState({});
 
-  useEffect(() => {
-    fetchBookings();
-    
-    // Автообновление каждые 5 секунд
-    const interval = setInterval(() => {
-      fetchBookings();
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [customerId]);
+  const mountedRef = useRef(true);
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     try {
       const response = await api.get(`/bookings?customerId=${customerId}`);
       const bookingsData = response.data;
+      if (!mountedRef.current) return;
       setBookings(bookingsData);
-      
+
       // Проверяем какие бронирования уже имеют отзывы
       const feedbackPromises = bookingsData
         .filter(b => b.status === 'completed')
@@ -36,17 +28,34 @@ function BookingList({ customerId }) {
             return { [b.booking_id]: false };
           }
         });
-      
+
       const feedbackResults = await Promise.all(feedbackPromises);
       const feedbackMap = feedbackResults.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+      if (!mountedRef.current) return;
       setFeedbackStatus(feedbackMap);
-      
+
       setLoading(false);
     } catch (error) {
+      if (!mountedRef.current) return;
       console.error('Error fetching bookings:', error);
       setLoading(false);
     }
-  };
+  }, [customerId]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    fetchBookings();
+
+    // Автообновление каждые 5 секунд
+    const interval = setInterval(() => {
+      fetchBookings();
+    }, 5000);
+
+    return () => {
+      mountedRef.current = false;
+      clearInterval(interval);
+    };
+  }, [fetchBookings]);
 
   const handleCancelBooking = async (bookingId) => {
     if (window.confirm('Are you sure you want to cancel this booking?')) {

@@ -46,6 +46,24 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Vehicle Service Booking System API is running' });
 });
 
+// Ensure certain schema migrations are present (safe to run on every start)
+// This helps when schema.sql has been updated but the running database hasn't been migrated yet.
+(async () => {
+  try {
+    const db = require('./config/database');
+    // Use the raw pool (pg Pool) to run migration SQL directly
+    if (db && db.pool && typeof db.pool.query === 'function') {
+      // Add missing password_hash to mechanics if not present
+      await db.pool.query(`ALTER TABLE mechanics ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255);`);
+      console.log('Startup migration: ensured mechanics.password_hash column exists');
+    } else {
+      console.warn('Startup migration: database pool not available, skipping automatic migrations');
+    }
+  } catch (err) {
+    console.error('Error running startup migrations:', err.message || err);
+  }
+})();
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

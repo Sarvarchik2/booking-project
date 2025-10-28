@@ -1,6 +1,3 @@
--- Create Database Schema for Vehicle Service Booking System
-
--- Drop existing tables if they exist
 DROP TABLE IF EXISTS feedback CASCADE;
 DROP TABLE IF EXISTS invoice_items CASCADE;
 DROP TABLE IF EXISTS invoices CASCADE;
@@ -10,7 +7,6 @@ DROP TABLE IF EXISTS vehicles CASCADE;
 DROP TABLE IF EXISTS customers CASCADE;
 DROP TABLE IF EXISTS service_types CASCADE;
 
--- Customers Table
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
@@ -26,7 +22,6 @@ CREATE TABLE customers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Vehicles Table
 CREATE TABLE vehicles (
     vehicle_id SERIAL PRIMARY KEY,
     customer_id INTEGER REFERENCES customers(customer_id) ON DELETE CASCADE,
@@ -41,23 +36,22 @@ CREATE TABLE vehicles (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Service Types Table
 CREATE TABLE service_types (
     service_type_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
     base_price DECIMAL(10, 2) NOT NULL,
-    estimated_duration INTEGER, -- in minutes
+    estimated_duration INTEGER,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Mechanics Table
 CREATE TABLE mechanics (
     mechanic_id SERIAL PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255),
     phone VARCHAR(20),
     specialization VARCHAR(255),
     hourly_rate DECIMAL(10, 2),
@@ -66,7 +60,6 @@ CREATE TABLE mechanics (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Bookings Table
 CREATE TABLE bookings (
     booking_id SERIAL PRIMARY KEY,
     customer_id INTEGER REFERENCES customers(customer_id) ON DELETE CASCADE,
@@ -75,7 +68,7 @@ CREATE TABLE bookings (
     mechanic_id INTEGER REFERENCES mechanics(mechanic_id) ON DELETE SET NULL,
     booking_date DATE NOT NULL,
     booking_time TIME NOT NULL,
-    status VARCHAR(50) DEFAULT 'scheduled', -- scheduled, in_progress, completed, cancelled
+    status VARCHAR(50) DEFAULT 'scheduled', 
     notes TEXT,
     estimated_completion TIMESTAMP,
     actual_completion TIMESTAMP,
@@ -83,7 +76,6 @@ CREATE TABLE bookings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Invoices Table
 CREATE TABLE invoices (
     invoice_id SERIAL PRIMARY KEY,
     booking_id INTEGER REFERENCES bookings(booking_id) ON DELETE CASCADE,
@@ -93,7 +85,7 @@ CREATE TABLE invoices (
     subtotal DECIMAL(10, 2) NOT NULL,
     tax DECIMAL(10, 2) DEFAULT 0,
     total DECIMAL(10, 2) NOT NULL,
-    payment_status VARCHAR(50) DEFAULT 'pending', -- pending, paid, cancelled
+    payment_status VARCHAR(50) DEFAULT 'pending', 
     payment_method VARCHAR(50),
     payment_date TIMESTAMP,
     notes TEXT,
@@ -101,7 +93,6 @@ CREATE TABLE invoices (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Invoice Items Table
 CREATE TABLE invoice_items (
     item_id SERIAL PRIMARY KEY,
     invoice_id INTEGER REFERENCES invoices(invoice_id) ON DELETE CASCADE,
@@ -112,7 +103,6 @@ CREATE TABLE invoice_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Feedback Table
 CREATE TABLE feedback (
     feedback_id SERIAL PRIMARY KEY,
     booking_id INTEGER REFERENCES bookings(booking_id) ON DELETE CASCADE,
@@ -123,7 +113,6 @@ CREATE TABLE feedback (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create Indexes for better performance
 CREATE INDEX idx_customers_email ON customers(email);
 CREATE INDEX idx_vehicles_customer ON vehicles(customer_id);
 CREATE INDEX idx_bookings_customer ON bookings(customer_id);
@@ -133,7 +122,6 @@ CREATE INDEX idx_invoices_customer ON invoices(customer_id);
 CREATE INDEX idx_invoices_booking ON invoices(booking_id);
 CREATE INDEX idx_feedback_customer ON feedback(customer_id);
 
--- Insert Sample Service Types
 INSERT INTO service_types (name, description, base_price, estimated_duration) VALUES
 ('Oil Change', 'Standard oil change service', 49.99, 30),
 ('Brake Inspection', 'Complete brake system inspection', 79.99, 45),
@@ -145,10 +133,81 @@ INSERT INTO service_types (name, description, base_price, estimated_duration) VA
 ('Wheel Alignment', 'Four-wheel alignment service', 89.99, 60),
 ('Full Service', 'Comprehensive vehicle inspection and service', 299.99, 180);
 
--- Insert Sample Mechanics
-INSERT INTO mechanics (first_name, last_name, email, phone, specialization, hourly_rate) VALUES
-('John', 'Smith', 'john.smith@garage.com', '555-0101', 'Engine Specialist', 75.00),
-('Maria', 'Garcia', 'maria.garcia@garage.com', '555-0102', 'Brake Systems', 70.00),
-('David', 'Chen', 'david.chen@garage.com', '555-0103', 'Transmission Expert', 80.00),
-('Sarah', 'Johnson', 'sarah.johnson@garage.com', '555-0104', 'Electrical Systems', 75.00),
-('Michael', 'Brown', 'michael.brown@garage.com', '555-0105', 'General Maintenance', 65.00);
+-- password_hash left NULL initially; mechanics should use the setup page to set a password
+INSERT INTO mechanics (first_name, last_name, email, password_hash, phone, specialization, hourly_rate) VALUES
+('John', 'Smith', 'john.smith@garage.com', NULL, '555-0101', 'Engine Specialist', 75.00),
+('Maria', 'Garcia', 'maria.garcia@garage.com', NULL, '555-0102', 'Brake Systems', 70.00),
+('David', 'Chen', 'david.chen@garage.com', NULL, '555-0103', 'Transmission Expert', 80.00),
+('Sarah', 'Johnson', 'sarah.johnson@garage.com', NULL, '555-0104', 'Electrical Systems', 75.00),
+('Michael', 'Brown', 'michael.brown@garage.com', NULL, '555-0105', 'General Maintenance', 65.00);
+
+-- Sample customers, vehicles, bookings, invoices and feedback
+-- Passwords hashed for 'customer123'
+INSERT INTO customers (first_name, last_name, email, password_hash, phone, address, city, state, zip_code)
+VALUES
+('Иван', 'Петров', 'ivan.petrov@example.com', '$2a$10$hqdYYxcj2qW.yqLJgvq9R.xCn1jbA0n1c/burLvkwDdiaqLVgJbsG', '+79123456789', 'ул. Ленина, 10', 'Москва', 'Москва', '101000'),
+('Мария', 'Сидорова', 'maria.sidorova@example.com', '$2a$10$hqdYYxcj2qW.yqLJgvq9R.xCn1jbA0n1c/burLvkwDdiaqLVgJbsG', '+79987654321', 'пр. Победы, 25', 'Санкт-Петербург', 'Санкт-Петербург', '190000');
+
+INSERT INTO vehicles (customer_id, make, model, year, vin, license_plate, mileage)
+VALUES
+((SELECT customer_id FROM customers WHERE email='ivan.petrov@example.com'), 'Toyota', 'Camry', 2020, 'JT2BF28K0X0123456', 'А123ВС777', 45000),
+((SELECT customer_id FROM customers WHERE email='maria.sidorova@example.com'), 'Honda', 'Civic', 2019, 'JHMFC36509S012345', 'В456ЕК199', 38000);
+
+-- Bookings: use existing mechanics and service_types inserted above. Dates use CURRENT_DATE +/- interval.
+INSERT INTO bookings (customer_id, vehicle_id, service_type_id, mechanic_id, booking_date, booking_time, status)
+VALUES
+((SELECT customer_id FROM customers WHERE email='ivan.petrov@example.com'),
+ (SELECT vehicle_id FROM vehicles WHERE vin='JT2BF28K0X0123456'),
+ (SELECT service_type_id FROM service_types WHERE name='Oil Change'),
+ (SELECT mechanic_id FROM mechanics WHERE email='maria.garcia@garage.com'),
+ CURRENT_DATE, '10:00', 'scheduled'),
+
+((SELECT customer_id FROM customers WHERE email='ivan.petrov@example.com'),
+ (SELECT vehicle_id FROM vehicles WHERE vin='JT2BF28K0X0123456'),
+ (SELECT service_type_id FROM service_types WHERE name='Brake Inspection'),
+ (SELECT mechanic_id FROM mechanics WHERE email='maria.garcia@garage.com'),
+ CURRENT_DATE, '14:00', 'in_progress'),
+
+((SELECT customer_id FROM customers WHERE email='ivan.petrov@example.com'),
+ (SELECT vehicle_id FROM vehicles WHERE vin='JT2BF28K0X0123456'),
+ (SELECT service_type_id FROM service_types WHERE name='Tire Rotation'),
+ (SELECT mechanic_id FROM mechanics WHERE email='maria.garcia@garage.com'),
+ CURRENT_DATE - INTERVAL '1 day', '11:00', 'completed'),
+
+((SELECT customer_id FROM customers WHERE email='maria.sidorova@example.com'),
+ (SELECT vehicle_id FROM vehicles WHERE vin='JHMFC36509S012345'),
+ (SELECT service_type_id FROM service_types WHERE name='Engine Diagnostic'),
+ (SELECT mechanic_id FROM mechanics WHERE email='david.chen@garage.com'),
+ CURRENT_DATE + INTERVAL '1 day', '09:00', 'scheduled');
+
+-- Create an invoice for the completed booking
+INSERT INTO invoices (booking_id, customer_id, invoice_number, subtotal, tax, total, payment_status, payment_method, invoice_date)
+VALUES (
+ (SELECT booking_id FROM bookings WHERE booking_date = CURRENT_DATE - INTERVAL '1 day' AND status='completed' LIMIT 1),
+ (SELECT customer_id FROM customers WHERE email='ivan.petrov@example.com'),
+ CONCAT('INV-', EXTRACT(EPOCH FROM now())::bigint),
+ (SELECT base_price FROM service_types WHERE name='Tire Rotation'),
+ (SELECT base_price FROM service_types WHERE name='Tire Rotation') * 0.10,
+ (SELECT base_price FROM service_types WHERE name='Tire Rotation') * 1.10,
+ 'paid', 'card', CURRENT_DATE
+);
+
+-- Invoice items
+INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total_price)
+VALUES (
+ (SELECT invoice_id FROM invoices ORDER BY created_at DESC LIMIT 1),
+ (SELECT name FROM service_types WHERE name='Tire Rotation'),
+ 1,
+ (SELECT base_price FROM service_types WHERE name='Tire Rotation'),
+ (SELECT base_price FROM service_types WHERE name='Tire Rotation')
+);
+
+-- Feedback for completed booking
+INSERT INTO feedback (booking_id, customer_id, mechanic_id, rating, comment)
+VALUES (
+ (SELECT booking_id FROM bookings WHERE booking_date = CURRENT_DATE - INTERVAL '1 day' AND status='completed' LIMIT 1),
+ (SELECT customer_id FROM customers WHERE email='ivan.petrov@example.com'),
+ (SELECT mechanic_id FROM mechanics WHERE email='maria.garcia@garage.com'),
+ 5,
+ 'Отличная работа! Быстро и качественно. Рекомендую!'
+);

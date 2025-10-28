@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 
 function InvoiceList({ customerId }) {
@@ -6,11 +6,7 @@ function InvoiceList({ customerId }) {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchInvoices();
-  }, [customerId]);
-
-  const fetchInvoices = async () => {
+  const fetchInvoices = useCallback(async () => {
     try {
       const response = await api.get(`/invoices?customerId=${customerId}`);
       setInvoices(response.data);
@@ -19,7 +15,11 @@ function InvoiceList({ customerId }) {
       console.error('Error fetching invoices:', error);
       setLoading(false);
     }
-  };
+  }, [customerId]);
+
+  useEffect(() => {
+    fetchInvoices();
+  }, [fetchInvoices]);
 
   const fetchInvoiceDetails = async (invoiceId) => {
     try {

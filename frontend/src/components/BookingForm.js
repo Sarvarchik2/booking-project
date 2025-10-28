@@ -17,27 +17,21 @@ function BookingForm({ customerId }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchVehicles();
-    fetchServiceTypes();
-  }, []);
+    const fetchAll = async () => {
+      try {
+        const [vehiclesRes, servicesRes] = await Promise.all([
+          api.get(`/vehicles/customer/${customerId}`),
+          api.get('/service-types?active=true')
+        ]);
+        setVehicles(vehiclesRes.data);
+        setServiceTypes(servicesRes.data);
+      } catch (error) {
+        console.error('Error fetching vehicles or service types:', error);
+      }
+    };
 
-  const fetchVehicles = async () => {
-    try {
-      const response = await api.get(`/vehicles/customer/${customerId}`);
-      setVehicles(response.data);
-    } catch (error) {
-      console.error('Error fetching vehicles:', error);
-    }
-  };
-
-  const fetchServiceTypes = async () => {
-    try {
-      const response = await api.get('/service-types?active=true');
-      setServiceTypes(response.data);
-    } catch (error) {
-      console.error('Error fetching service types:', error);
-    }
-  };
+    fetchAll();
+  }, [customerId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

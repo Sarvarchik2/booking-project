@@ -1,10 +1,21 @@
 
 
-cd /Users/student/Desktop/project
-rm -f backend/vehicle_service.db
+Set your DATABASE_URL first. Example:
 
-node backend/seed-test-data.js
+    export DATABASE_URL=postgres://user:password@localhost:5432/vehicle_service_db
 
-PORT=5001 node backend/server.js
+Run schema (creates tables and seeds service types & mechanics):
 
-/Users/student/Desktop/project/start-frontend.sh
+    psql $DATABASE_URL -f backend/config/schema.sql
+
+Optionally seed test data (customers, vehicles, bookings, invoices, feedback):
+
+    node backend/seed-test-data.js
+
+Start backend server:
+
+    PORT=5001 node backend/server.js
+
+Start frontend (in separate terminal):
+
+    ./start-frontend.sh

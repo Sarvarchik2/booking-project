@@ -14,7 +14,38 @@ function MechanicDashboard({ mechanic }) {
   const [activeTab, setActiveTab] = useState('bookings');
 
   useEffect(() => {
-    fetchDashboardData();
+    // fetchDashboardData depends on `mechanic`; define inside effect to avoid exhaustive-deps warning
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch mechanic's bookings
+        const bookingsRes = await api.get(`/mechanics/${mechanic.mechanic_id}/bookings`);
+        const bookingsData = bookingsRes.data;
+        
+        // Fetch feedback
+        const feedbackRes = await api.get(`/feedback?mechanicId=${mechanic.mechanic_id}`);
+        const feedbackData = feedbackRes.data;
+
+        // Fetch average rating
+        const ratingRes = await api.get(`/feedback/mechanic/${mechanic.mechanic_id}/average`);
+
+        const today = new Date().toISOString().split('T')[0];
+        setStats({
+          totalBookings: bookingsData.length,
+          todayBookings: bookingsData.filter(b => b.booking_date === today).length,
+          completedBookings: bookingsData.filter(b => b.status === 'completed').length,
+          avgRating: parseFloat(ratingRes.data.average_rating || 0).toFixed(1),
+        });
+
+        setBookings(bookingsData);
+        setFeedback(feedbackData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        setLoading(false);
+      }
+    };
+
+    if (mechanic) fetchDashboardData();
   }, [mechanic]);
 
   const fetchDashboardData = async () => {

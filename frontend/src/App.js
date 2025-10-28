@@ -16,7 +16,7 @@ import CustomerHistory from './components/CustomerHistory';
 function App() {
   const [customer, setCustomer] = useState(null);
   const [mechanic, setMechanic] = useState(null);
-  const [userRole, setUserRole] = useState(null);
+  // userRole persisted in localStorage; no local state needed
 
   useEffect(() => {
     // Check if customer is logged in
@@ -27,10 +27,8 @@ function App() {
     
     if (token && customerData && role === 'customer') {
       setCustomer(JSON.parse(customerData));
-      setUserRole('customer');
     } else if (token && mechanicData && role === 'mechanic') {
       setMechanic(JSON.parse(mechanicData));
-      setUserRole('mechanic');
     }
   }, []);
 
@@ -38,11 +36,9 @@ function App() {
     if (role === 'customer') {
       setCustomer(userData);
       localStorage.setItem('customer', JSON.stringify(userData));
-      setUserRole('customer');
     } else {
       setMechanic(userData);
       localStorage.setItem('mechanic', JSON.stringify(userData));
-      setUserRole('mechanic');
     }
     localStorage.setItem('token', token);
     localStorage.setItem('userRole', role);
@@ -51,7 +47,7 @@ function App() {
   const handleLogout = () => {
     setCustomer(null);
     setMechanic(null);
-    setUserRole(null);
+  // role cleared from localStorage only
     localStorage.removeItem('token');
     localStorage.removeItem('customer');
     localStorage.removeItem('mechanic');

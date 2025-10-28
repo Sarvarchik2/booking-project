@@ -14,17 +14,17 @@ function FeedbackForm({ customerId }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const fetchBookingDetails = async () => {
+      try {
+        const response = await api.get(`/bookings/${bookingId}`);
+        setBooking(response.data);
+      } catch (error) {
+        console.error('Error fetching booking details:', error);
+      }
+    };
+
     fetchBookingDetails();
   }, [bookingId]);
-
-  const fetchBookingDetails = async () => {
-    try {
-      const response = await api.get(`/bookings/${bookingId}`);
-      setBooking(response.data);
-    } catch (error) {
-      console.error('Error fetching booking details:', error);
-    }
-  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

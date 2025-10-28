@@ -19,7 +19,7 @@ router.post('/login', [
     const { email, password } = req.body;
 
     const result = await pool.query(
-      'SELECT * FROM mechanics WHERE email = ?',
+  'SELECT * FROM mechanics WHERE email = $1',
       [email]
     );
 
@@ -67,7 +67,7 @@ router.post('/set-password', [
     const { email, password } = req.body;
 
     const result = await pool.query(
-      'SELECT * FROM mechanics WHERE email = ?',
+  'SELECT * FROM mechanics WHERE email = $1',
       [email]
     );
 
@@ -79,7 +79,7 @@ router.post('/set-password', [
     const password_hash = await bcrypt.hash(password, salt);
 
     await pool.query(
-      'UPDATE mechanics SET password_hash = ? WHERE email = ?',
+  'UPDATE mechanics SET password_hash = $1 WHERE email = $2',
       [password_hash, email]
     );
 

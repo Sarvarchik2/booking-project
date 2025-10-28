@@ -21,15 +21,15 @@ router.get('/', async (req, res) => {
     const params = [];
     if (customerId) {
       params.push(customerId);
-      query += ` AND f.customer_id = ?`;
+      query += ` AND f.customer_id = $${params.length}`;
     }
     if (mechanicId) {
       params.push(mechanicId);
-      query += ` AND f.mechanic_id = ?`;
+      query += ` AND f.mechanic_id = $${params.length}`;
     }
     if (bookingId) {
       params.push(bookingId);
-      query += ` AND f.booking_id = ?`;
+      query += ` AND f.booking_id = $${params.length}`;
     }
 
     query += ' ORDER BY f.created_at DESC';

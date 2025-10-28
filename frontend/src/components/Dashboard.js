@@ -13,40 +13,47 @@ function Dashboard({ customer }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch bookings
+        const bookingsRes = await api.get(`/bookings?customerId=${customer.customer_id}`);
+        const bookings = bookingsRes.data;
+        
+        // Fetch invoices
+        const invoicesRes = await api.get(`/invoices?customerId=${customer.customer_id}`);
+        const invoices = invoicesRes.data;
+
+        if (!mounted) return;
+        setStats({
+          totalBookings: bookings.length,
+          pendingBookings: bookings.filter(b => b.status === 'scheduled').length,
+          totalInvoices: invoices.length,
+          pendingPayments: invoices.filter(i => i.payment_status === 'pending').length,
+        });
+
+        setRecentBookings(bookings.slice(0, 5));
+        setLoading(false);
+      } catch (error) {
+        if (!mounted) return;
+        console.error('Error fetching dashboard data:', error);
+        setLoading(false);
+      }
+    };
+
     fetchDashboardData();
-    
+
     // Автообновление каждые 10 секунд
     const interval = setInterval(() => {
       fetchDashboardData();
     }, 10000);
-    
-    return () => clearInterval(interval);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, [customer]);
-
-  const fetchDashboardData = async () => {
-    try {
-      // Fetch bookings
-      const bookingsRes = await api.get(`/bookings?customerId=${customer.customer_id}`);
-      const bookings = bookingsRes.data;
-      
-      // Fetch invoices
-      const invoicesRes = await api.get(`/invoices?customerId=${customer.customer_id}`);
-      const invoices = invoicesRes.data;
-
-      setStats({
-        totalBookings: bookings.length,
-        pendingBookings: bookings.filter(b => b.status === 'scheduled').length,
-        totalInvoices: invoices.length,
-        pendingPayments: invoices.filter(i => i.payment_status === 'pending').length,
-      });
-
-      setRecentBookings(bookings.slice(0, 5));
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return <div className="loading">Loading dashboard...</div>;
