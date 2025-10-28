@@ -14,7 +14,8 @@ Optionally seed test data (customers, vehicles, bookings, invoices, feedback):
 
 Start backend server:
 
-    PORT=5001 node backend/server.js
+cd /Users/admin/Documents/booking-project
+PORT=5001 DATABASE_URL="postgres://appuser:secret@localhost:5432/vehicle_service_db_dev" node backend/server.js
 
 Start frontend (in separate terminal):
 

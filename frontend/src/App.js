@@ -68,7 +68,7 @@ function App() {
                   <Link to="/bookings">Bookings</Link>
                   <Link to="/invoices">Invoices</Link>
                   <Link to="/history">History</Link>
-                  <span style={{ color: '#ecf0f1' }}>
+                  <span style={{ color: '#000' }}>
                     👤 {customer.first_name}
                   </span>
                   <button onClick={handleLogout} className="btn btn-secondary">
@@ -78,7 +78,7 @@ function App() {
               ) : mechanic ? (
                 <>
                   <Link to="/mechanic-dashboard">Dashboard</Link>
-                  <span style={{ color: '#ecf0f1' }}>
+                  <span style={{ color: '#000' }}>
                     🔧 {mechanic.first_name} {mechanic.last_name}
                   </span>
                   <button onClick={handleLogout} className="btn btn-secondary">
