@@ -113,16 +113,16 @@ function MechanicDashboard({ mechanic }) {
       </p>
 
       <div className="grid grid-2" style={{ marginTop: '30px' }}>
-        <div className="card" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-          <h3 style={{ color: 'white' }}>Total Bookings</h3>
-          <p style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{stats.totalBookings}</p>
-          <p>{stats.todayBookings} scheduled today</p>
+        <div className="card stat-card">
+          <h3>Total Bookings</h3>
+          <p className="stat-number">{stats.totalBookings}</p>
+          <p className="stat-sub">{stats.todayBookings} scheduled today</p>
         </div>
 
-        <div className="card" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
-          <h3 style={{ color: 'white' }}>Average Rating</h3>
-          <p style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{stats.avgRating} ⭐</p>
-          <p>{feedback.length} reviews</p>
+        <div className="card stat-card alt">
+          <h3>Average Rating</h3>
+          <p className="stat-number">{stats.avgRating} ⭐</p>
+          <p className="stat-sub">{feedback.length} reviews</p>
         </div>
       </div>
 
@@ -225,7 +225,7 @@ function MechanicDashboard({ mechanic }) {
             ) : (
               <div className="grid">
                 {feedback.map(fb => (
-                  <div key={fb.feedback_id} className="card" style={{ background: '#f8f9fa' }}>
+                  <div key={fb.feedback_id} className="card muted">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
                         <strong>{fb.customer_first_name} {fb.customer_last_name}</strong>

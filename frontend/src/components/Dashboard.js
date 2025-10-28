@@ -64,16 +64,16 @@ function Dashboard({ customer }) {
       <h1 style={{ marginTop: '20px' }}>Dashboard</h1>
       
       <div className="grid grid-2" style={{ marginTop: '30px' }}>
-        <div className="card" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-          <h3 style={{ color: 'white' }}>Total Bookings</h3>
-          <p style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{stats.totalBookings}</p>
-          <p>{stats.pendingBookings} pending</p>
+        <div className="card stat-card">
+          <h3>Total Bookings</h3>
+          <p className="stat-number">{stats.totalBookings}</p>
+          <p className="stat-sub">{stats.pendingBookings} pending</p>
         </div>
 
-        <div className="card" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
-          <h3 style={{ color: 'white' }}>Total Invoices</h3>
-          <p style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{stats.totalInvoices}</p>
-          <p>{stats.pendingPayments} pending payments</p>
+        <div className="card stat-card alt">
+          <h3>Total Invoices</h3>
+          <p className="stat-number">{stats.totalInvoices}</p>
+          <p className="stat-sub">{stats.pendingPayments} pending payments</p>
         </div>
       </div>
 
