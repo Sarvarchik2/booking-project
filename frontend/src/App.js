@@ -16,6 +16,7 @@ import CustomerHistory from './components/CustomerHistory';
 function App() {
   const [customer, setCustomer] = useState(null);
   const [mechanic, setMechanic] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // userRole persisted in localStorage; no local state needed
 
   useEffect(() => {
@@ -24,7 +25,7 @@ function App() {
     const customerData = localStorage.getItem('customer');
     const mechanicData = localStorage.getItem('mechanic');
     const role = localStorage.getItem('userRole');
-    
+
     if (token && customerData && role === 'customer') {
       setCustomer(JSON.parse(customerData));
     } else if (token && mechanicData && role === 'mechanic') {
@@ -47,11 +48,20 @@ function App() {
   const handleLogout = () => {
     setCustomer(null);
     setMechanic(null);
-  // role cleared from localStorage only
+    // role cleared from localStorage only
     localStorage.removeItem('token');
     localStorage.removeItem('customer');
     localStorage.removeItem('mechanic');
     localStorage.removeItem('userRole');
+    setMobileMenuOpen(false); // Close menu on logout
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -59,15 +69,24 @@ function App() {
       <div className="App">
         <nav className="navbar">
           <div className="navbar-content">
-            <h1>🚗 Vehicle Service Booking</h1>
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            <div className="navbar-header">
+              <h1>🚗 Vehicle Service Booking</h1>
+              <button
+                className="mobile-menu-toggle"
+                onClick={toggleMobileMenu}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? '✕' : '☰'}
+              </button>
+            </div>
+            <div className={`navbar-links ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
               {customer ? (
                 <>
-                  <Link to="/">Dashboard</Link>
-                  <Link to="/vehicles">My Vehicles</Link>
-                  <Link to="/bookings">Bookings</Link>
-                  <Link to="/invoices">Invoices</Link>
-                  <Link to="/history">History</Link>
+                  <Link to="/" onClick={closeMobileMenu}>Dashboard</Link>
+                  <Link to="/vehicles" onClick={closeMobileMenu}>My Vehicles</Link>
+                  <Link to="/bookings" onClick={closeMobileMenu}>Bookings</Link>
+                  <Link to="/invoices" onClick={closeMobileMenu}>Invoices</Link>
+                  <Link to="/history" onClick={closeMobileMenu}>History</Link>
                   <span style={{ color: '#000' }}>
                     👤 {customer.first_name}
                   </span>
@@ -77,7 +96,7 @@ function App() {
                 </>
               ) : mechanic ? (
                 <>
-                  <Link to="/mechanic-dashboard">Dashboard</Link>
+                  <Link to="/mechanic-dashboard" onClick={closeMobileMenu}>Dashboard</Link>
                   <span style={{ color: '#000' }}>
                     🔧 {mechanic.first_name} {mechanic.last_name}
                   </span>
@@ -87,9 +106,9 @@ function App() {
                 </>
               ) : (
                 <>
-                  <Link to="/login">Customer Login</Link>
-                  <Link to="/mechanic-login">Mechanic Login</Link>
-                  <Link to="/register">Register</Link>
+                  <Link to="/login" onClick={closeMobileMenu}>Customer Login</Link>
+                  <Link to="/mechanic-login" onClick={closeMobileMenu}>Mechanic Login</Link>
+                  <Link to="/register" onClick={closeMobileMenu}>Register</Link>
                 </>
               )}
             </div>
@@ -108,7 +127,7 @@ function App() {
             <Route path="/invoices" element={customer ? <InvoiceList customerId={customer.customer_id} /> : <Navigate to="/login" />} />
             <Route path="/feedback/:bookingId" element={customer ? <FeedbackForm customerId={customer.customer_id} /> : <Navigate to="/login" />} />
             <Route path="/history" element={customer ? <CustomerHistory customerId={customer.customer_id} /> : <Navigate to="/login" />} />
-            
+
             {/* Mechanic Routes */}
             <Route path="/mechanic-login" element={<MechanicLogin onLogin={handleLogin} />} />
             <Route path="/mechanic-setup" element={<MechanicSetup />} />

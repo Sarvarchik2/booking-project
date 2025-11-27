@@ -91,36 +91,38 @@ function CustomerHistory({ customerId }) {
             {history.bookings.length === 0 ? (
               <p style={{ textAlign: 'center', color: '#7f8c8d' }}>No booking history.</p>
             ) : (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Vehicle</th>
-                    <th>Service</th>
-                    <th>Mechanic</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.bookings.map(booking => (
-                    <tr key={booking.booking_id}>
-                      <td>{new Date(booking.booking_date).toLocaleDateString()}</td>
-                      <td>{booking.make} {booking.model} ({booking.year})</td>
-                      <td>{booking.service_name}</td>
-                      <td>
-                        {booking.mechanic_first_name 
-                          ? `${booking.mechanic_first_name} ${booking.mechanic_last_name}`
-                          : 'Not assigned'}
-                      </td>
-                      <td>
-                        <span className={`status-badge status-${booking.status}`}>
-                          {booking.status.replace('_', ' ')}
-                        </span>
-                      </td>
+              <div className="table-wrapper">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Vehicle</th>
+                      <th>Service</th>
+                      <th>Mechanic</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {history.bookings.map(booking => (
+                      <tr key={booking.booking_id}>
+                        <td>{new Date(booking.booking_date).toLocaleDateString()}</td>
+                        <td>{booking.make} {booking.model} ({booking.year})</td>
+                        <td>{booking.service_name}</td>
+                        <td>
+                          {booking.mechanic_first_name
+                            ? `${booking.mechanic_first_name} ${booking.mechanic_last_name}`
+                            : 'Not assigned'}
+                        </td>
+                        <td>
+                          <span className={`status-badge status-${booking.status}`}>
+                            {booking.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}
@@ -130,36 +132,38 @@ function CustomerHistory({ customerId }) {
             {history.invoices.length === 0 ? (
               <p style={{ textAlign: 'center', color: '#7f8c8d' }}>No invoice history.</p>
             ) : (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Invoice #</th>
-                    <th>Date</th>
-                    <th>Total</th>
-                    <th>Payment Status</th>
-                    <th>Payment Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {history.invoices.map(invoice => (
-                    <tr key={invoice.invoice_id}>
-                      <td>{invoice.invoice_number}</td>
-                      <td>{new Date(invoice.invoice_date).toLocaleDateString()}</td>
-                      <td>${parseFloat(invoice.total).toFixed(2)}</td>
-                      <td>
-                        <span className={`status-badge status-${invoice.payment_status}`}>
-                          {invoice.payment_status}
-                        </span>
-                      </td>
-                      <td>
-                        {invoice.payment_date 
-                          ? new Date(invoice.payment_date).toLocaleDateString()
-                          : 'N/A'}
-                      </td>
+              <div className="table-wrapper">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Invoice #</th>
+                      <th>Date</th>
+                      <th>Total</th>
+                      <th>Payment Status</th>
+                      <th>Payment Date</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {history.invoices.map(invoice => (
+                      <tr key={invoice.invoice_id}>
+                        <td>{invoice.invoice_number}</td>
+                        <td>{new Date(invoice.invoice_date).toLocaleDateString()}</td>
+                        <td>${parseFloat(invoice.total).toFixed(2)}</td>
+                        <td>
+                          <span className={`status-badge status-${invoice.payment_status}`}>
+                            {invoice.payment_status}
+                          </span>
+                        </td>
+                        <td>
+                          {invoice.payment_date
+                            ? new Date(invoice.payment_date).toLocaleDateString()
+                            : 'N/A'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}

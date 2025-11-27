@@ -68,8 +68,8 @@ function BookingList({ customerId }) {
     }
   };
 
-  const filteredBookings = filter === 'all' 
-    ? bookings 
+  const filteredBookings = filter === 'all'
+    ? bookings
     : bookings.filter(b => b.status === filter);
 
   if (loading) {
@@ -100,73 +100,75 @@ function BookingList({ customerId }) {
         {filteredBookings.length === 0 ? (
           <p style={{ textAlign: 'center', color: '#7f8c8d' }}>No bookings found.</p>
         ) : (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Date & Time</th>
-                <th>Vehicle</th>
-                <th>Service</th>
-                <th>Mechanic</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredBookings.map(booking => (
-                <tr key={booking.booking_id}>
-                  <td>
-                    {new Date(booking.booking_date).toLocaleDateString()}<br />
-                    {booking.booking_time}
-                  </td>
-                  <td>
-                    {booking.make} {booking.model}<br />
-                    <small>{booking.year}</small>
-                  </td>
-                  <td>{booking.service_name}</td>
-                  <td>
-                    {booking.mechanic_first_name 
-                      ? `${booking.mechanic_first_name} ${booking.mechanic_last_name}`
-                      : 'Not assigned yet'}
-                  </td>
-                  <td>
-                    <span className={`status-badge status-${booking.status}`}>
-                      {booking.status.replace('_', ' ')}
-                    </span>
-                  </td>
-                  <td>
-                    {booking.status === 'scheduled' && (
-                      <button
-                        onClick={() => handleCancelBooking(booking.booking_id)}
-                        className="btn btn-danger"
-                        style={{ fontSize: '12px', padding: '6px 12px' }}
-                      >
-                        Cancel
-                      </button>
-                    )}
-                    {booking.status === 'in_progress' && (
-                      <span style={{ color: '#3498db', fontWeight: 'bold' }}>
-                        🔧 In Progress
-                      </span>
-                    )}
-                    {booking.status === 'completed' && !feedbackStatus[booking.booking_id] && (
-                      <Link
-                        to={`/feedback/${booking.booking_id}`}
-                        className="btn btn-success"
-                        style={{ fontSize: '12px', padding: '6px 12px', textDecoration: 'none' }}
-                      >
-                        ⭐ Give Feedback
-                      </Link>
-                    )}
-                    {booking.status === 'completed' && feedbackStatus[booking.booking_id] && (
-                      <span style={{ color: '#27ae60', fontWeight: 'bold' }}>
-                        ✅ Feedback Sent
-                      </span>
-                    )}
-                  </td>
+          <div className="table-wrapper">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Vehicle</th>
+                  <th>Service</th>
+                  <th>Mechanic</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredBookings.map(booking => (
+                  <tr key={booking.booking_id}>
+                    <td>
+                      {new Date(booking.booking_date).toLocaleDateString()}<br />
+                      {booking.booking_time}
+                    </td>
+                    <td>
+                      {booking.make} {booking.model}<br />
+                      <small>{booking.year}</small>
+                    </td>
+                    <td>{booking.service_name}</td>
+                    <td>
+                      {booking.mechanic_first_name
+                        ? `${booking.mechanic_first_name} ${booking.mechanic_last_name}`
+                        : 'Not assigned yet'}
+                    </td>
+                    <td>
+                      <span className={`status-badge status-${booking.status}`}>
+                        {booking.status.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td>
+                      {booking.status === 'scheduled' && (
+                        <button
+                          onClick={() => handleCancelBooking(booking.booking_id)}
+                          className="btn btn-danger"
+                          style={{ fontSize: '12px', padding: '6px 12px' }}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                      {booking.status === 'in_progress' && (
+                        <span style={{ color: '#3498db', fontWeight: 'bold' }}>
+                          🔧 In Progress
+                        </span>
+                      )}
+                      {booking.status === 'completed' && !feedbackStatus[booking.booking_id] && (
+                        <Link
+                          to={`/feedback/${booking.booking_id}`}
+                          className="btn btn-success"
+                          style={{ fontSize: '12px', padding: '6px 12px', textDecoration: 'none' }}
+                        >
+                          ⭐ Give Feedback
+                        </Link>
+                      )}
+                      {booking.status === 'completed' && feedbackStatus[booking.booking_id] && (
+                        <span style={{ color: '#27ae60', fontWeight: 'bold' }}>
+                          ✅ Feedback Sent
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

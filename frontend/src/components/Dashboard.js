@@ -20,7 +20,7 @@ function Dashboard({ customer }) {
         // Fetch bookings
         const bookingsRes = await api.get(`/bookings?customerId=${customer.customer_id}`);
         const bookings = bookingsRes.data;
-        
+
         // Fetch invoices
         const invoicesRes = await api.get(`/invoices?customerId=${customer.customer_id}`);
         const invoices = invoicesRes.data;
@@ -62,7 +62,7 @@ function Dashboard({ customer }) {
   return (
     <div>
       <h1 style={{ marginTop: '20px' }}>Dashboard</h1>
-      
+
       <div className="grid grid-2" style={{ marginTop: '30px' }}>
         <div className="card stat-card">
           <h3>Total Bookings</h3>
@@ -99,36 +99,38 @@ function Dashboard({ customer }) {
         {recentBookings.length === 0 ? (
           <p style={{ marginTop: '20px', color: '#7f8c8d' }}>No bookings yet. Book your first service!</p>
         ) : (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Vehicle</th>
-                <th>Service</th>
-                <th>Mechanic</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentBookings.map(booking => (
-                <tr key={booking.booking_id}>
-                  <td>{new Date(booking.booking_date).toLocaleDateString()}</td>
-                  <td>{booking.make} {booking.model} ({booking.year})</td>
-                  <td>{booking.service_name}</td>
-                  <td>
-                    {booking.mechanic_first_name 
-                      ? `${booking.mechanic_first_name} ${booking.mechanic_last_name}`
-                      : 'Not assigned'}
-                  </td>
-                  <td>
-                    <span className={`status-badge status-${booking.status}`}>
-                      {booking.status.replace('_', ' ')}
-                    </span>
-                  </td>
+          <div className="table-wrapper">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Vehicle</th>
+                  <th>Service</th>
+                  <th>Mechanic</th>
+                  <th>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentBookings.map(booking => (
+                  <tr key={booking.booking_id}>
+                    <td>{new Date(booking.booking_date).toLocaleDateString()}</td>
+                    <td>{booking.make} {booking.model} ({booking.year})</td>
+                    <td>{booking.service_name}</td>
+                    <td>
+                      {booking.mechanic_first_name
+                        ? `${booking.mechanic_first_name} ${booking.mechanic_last_name}`
+                        : 'Not assigned'}
+                    </td>
+                    <td>
+                      <span className={`status-badge status-${booking.status}`}>
+                        {booking.status.replace('_', ' ')}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

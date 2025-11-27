@@ -20,7 +20,7 @@ function MechanicDashboard({ mechanic }) {
         // Fetch mechanic's bookings
         const bookingsRes = await api.get(`/mechanics/${mechanic.mechanic_id}/bookings`);
         const bookingsData = bookingsRes.data;
-        
+
         // Fetch feedback
         const feedbackRes = await api.get(`/feedback?mechanicId=${mechanic.mechanic_id}`);
         const feedbackData = feedbackRes.data;
@@ -53,7 +53,7 @@ function MechanicDashboard({ mechanic }) {
       // Fetch mechanic's bookings
       const bookingsRes = await api.get(`/mechanics/${mechanic.mechanic_id}/bookings`);
       const bookingsData = bookingsRes.data;
-      
+
       // Fetch feedback
       const feedbackRes = await api.get(`/feedback?mechanicId=${mechanic.mechanic_id}`);
       const feedbackData = feedbackRes.data;
@@ -62,7 +62,7 @@ function MechanicDashboard({ mechanic }) {
       const ratingRes = await api.get(`/feedback/mechanic/${mechanic.mechanic_id}/average`);
 
       const today = new Date().toISOString().split('T')[0];
-      
+
       setStats({
         totalBookings: bookingsData.length,
         todayBookings: bookingsData.filter(b => b.booking_date === today).length,
@@ -81,7 +81,7 @@ function MechanicDashboard({ mechanic }) {
 
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
-      await api.put(`/bookings/${bookingId}/status`, { 
+      await api.put(`/bookings/${bookingId}/status`, {
         status: newStatus,
         actual_completion: newStatus === 'completed' ? new Date().toISOString() : null
       });
@@ -161,59 +161,61 @@ function MechanicDashboard({ mechanic }) {
             {bookings.length === 0 ? (
               <p style={{ textAlign: 'center', color: '#7f8c8d' }}>No bookings assigned yet.</p>
             ) : (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Date & Time</th>
-                    <th>Customer</th>
-                    <th>Vehicle</th>
-                    <th>Service</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.map(booking => (
-                    <tr key={booking.booking_id}>
-                      <td>
-                        {new Date(booking.booking_date).toLocaleDateString()}<br />
-                        {booking.booking_time}
-                      </td>
-                      <td>
-                        {booking.customer_first_name} {booking.customer_last_name}<br />
-                        <small>{booking.customer_email}</small>
-                      </td>
-                      <td>{booking.make} {booking.model} ({booking.year})</td>
-                      <td>{booking.service_name}</td>
-                      <td>
-                        <span className={`status-badge status-${booking.status}`}>
-                          {booking.status.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td>
-                        {booking.status === 'scheduled' && (
-                          <button
-                            onClick={() => updateBookingStatus(booking.booking_id, 'in_progress')}
-                            className="btn btn-primary"
-                            style={{ fontSize: '12px', padding: '6px 12px', marginRight: '5px' }}
-                          >
-                            Start Work
-                          </button>
-                        )}
-                        {booking.status === 'in_progress' && (
-                          <button
-                            onClick={() => updateBookingStatus(booking.booking_id, 'completed')}
-                            className="btn btn-success"
-                            style={{ fontSize: '12px', padding: '6px 12px' }}
-                          >
-                            Complete
-                          </button>
-                        )}
-                      </td>
+              <div className="table-wrapper">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Date & Time</th>
+                      <th>Customer</th>
+                      <th>Vehicle</th>
+                      <th>Service</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {bookings.map(booking => (
+                      <tr key={booking.booking_id}>
+                        <td>
+                          {new Date(booking.booking_date).toLocaleDateString()}<br />
+                          {booking.booking_time}
+                        </td>
+                        <td>
+                          {booking.customer_first_name} {booking.customer_last_name}<br />
+                          <small>{booking.customer_email}</small>
+                        </td>
+                        <td>{booking.make} {booking.model} ({booking.year})</td>
+                        <td>{booking.service_name}</td>
+                        <td>
+                          <span className={`status-badge status-${booking.status}`}>
+                            {booking.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td>
+                          {booking.status === 'scheduled' && (
+                            <button
+                              onClick={() => updateBookingStatus(booking.booking_id, 'in_progress')}
+                              className="btn btn-primary"
+                              style={{ fontSize: '12px', padding: '6px 12px', marginRight: '5px' }}
+                            >
+                              Start Work
+                            </button>
+                          )}
+                          {booking.status === 'in_progress' && (
+                            <button
+                              onClick={() => updateBookingStatus(booking.booking_id, 'completed')}
+                              className="btn btn-success"
+                              style={{ fontSize: '12px', padding: '6px 12px' }}
+                            >
+                              Complete
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}
