@@ -139,7 +139,6 @@ function BookingList({ customerId }) {
                         <button
                           onClick={() => handleCancelBooking(booking.booking_id)}
                           className="btn btn-danger"
-                          style={{ fontSize: '12px', padding: '6px 12px' }}
                         >
                           Cancel
                         </button>
@@ -153,7 +152,6 @@ function BookingList({ customerId }) {
                         <Link
                           to={`/feedback/${booking.booking_id}`}
                           className="btn btn-success"
-                          style={{ fontSize: '12px', padding: '6px 12px', textDecoration: 'none' }}
                         >
                           ⭐ Give Feedback
                         </Link>

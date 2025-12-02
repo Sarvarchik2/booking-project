@@ -16,8 +16,8 @@ import CustomerHistory from './components/CustomerHistory';
 function App() {
   const [customer, setCustomer] = useState(null);
   const [mechanic, setMechanic] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // userRole persisted in localStorage; no local state needed
 
   useEffect(() => {
     // Check if customer is logged in
@@ -31,6 +31,7 @@ function App() {
     } else if (token && mechanicData && role === 'mechanic') {
       setMechanic(JSON.parse(mechanicData));
     }
+    setLoading(false);
   }, []);
 
   const handleLogin = (userData, token, role = 'customer') => {
@@ -63,6 +64,10 @@ function App() {
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
+
+  if (loading) {
+    return <div className="loading">Loading application...</div>;
+  }
 
   return (
     <Router>

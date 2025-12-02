@@ -127,30 +127,16 @@ function MechanicDashboard({ mechanic }) {
       </div>
 
       <div className="card" style={{ marginTop: '30px' }}>
-        <div style={{ display: 'flex', gap: '20px', borderBottom: '2px solid #ecf0f1', marginBottom: '20px' }}>
+        <div className="tabs">
           <button
             onClick={() => setActiveTab('bookings')}
-            style={{
-              border: 'none',
-              background: 'none',
-              padding: '10px 20px',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'bookings' ? '3px solid #3498db' : 'none',
-              fontWeight: activeTab === 'bookings' ? 'bold' : 'normal',
-            }}
+            className={`tab-button ${activeTab === 'bookings' ? 'active' : ''}`}
           >
             My Bookings
           </button>
           <button
             onClick={() => setActiveTab('feedback')}
-            style={{
-              border: 'none',
-              background: 'none',
-              padding: '10px 20px',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'feedback' ? '3px solid #3498db' : 'none',
-              fontWeight: activeTab === 'feedback' ? 'bold' : 'normal',
-            }}
+            className={`tab-button ${activeTab === 'feedback' ? 'active' : ''}`}
           >
             Customer Feedback
           </button>
@@ -196,7 +182,6 @@ function MechanicDashboard({ mechanic }) {
                             <button
                               onClick={() => updateBookingStatus(booking.booking_id, 'in_progress')}
                               className="btn btn-primary"
-                              style={{ fontSize: '12px', padding: '6px 12px', marginRight: '5px' }}
                             >
                               Start Work
                             </button>
@@ -205,7 +190,6 @@ function MechanicDashboard({ mechanic }) {
                             <button
                               onClick={() => updateBookingStatus(booking.booking_id, 'completed')}
                               className="btn btn-success"
-                              style={{ fontSize: '12px', padding: '6px 12px' }}
                             >
                               Complete
                             </button>

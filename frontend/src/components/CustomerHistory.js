@@ -44,43 +44,22 @@ function CustomerHistory({ customerId }) {
       <h1 style={{ marginTop: '20px' }}>My History</h1>
 
       <div className="card">
-        <div style={{ display: 'flex', gap: '20px', borderBottom: '2px solid #ecf0f1', marginBottom: '20px' }}>
+        <div className="tabs">
           <button
             onClick={() => setActiveTab('bookings')}
-            style={{
-              border: 'none',
-              background: 'none',
-              padding: '10px 20px',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'bookings' ? '3px solid #3498db' : 'none',
-              fontWeight: activeTab === 'bookings' ? 'bold' : 'normal',
-            }}
+            className={`tab-button ${activeTab === 'bookings' ? 'active' : ''}`}
           >
             Bookings ({history.bookings.length})
           </button>
           <button
             onClick={() => setActiveTab('invoices')}
-            style={{
-              border: 'none',
-              background: 'none',
-              padding: '10px 20px',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'invoices' ? '3px solid #3498db' : 'none',
-              fontWeight: activeTab === 'invoices' ? 'bold' : 'normal',
-            }}
+            className={`tab-button ${activeTab === 'invoices' ? 'active' : ''}`}
           >
             Invoices ({history.invoices.length})
           </button>
           <button
             onClick={() => setActiveTab('feedback')}
-            style={{
-              border: 'none',
-              background: 'none',
-              padding: '10px 20px',
-              cursor: 'pointer',
-              borderBottom: activeTab === 'feedback' ? '3px solid #3498db' : 'none',
-              fontWeight: activeTab === 'feedback' ? 'bold' : 'normal',
-            }}
+            className={`tab-button ${activeTab === 'feedback' ? 'active' : ''}`}
           >
             Feedback ({history.feedback.length})
           </button>

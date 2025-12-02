@@ -92,7 +92,6 @@ function InvoiceList({ customerId }) {
                       <button
                         onClick={() => fetchInvoiceDetails(invoice.invoice_id)}
                         className="btn btn-primary"
-                        style={{ fontSize: '12px', padding: '6px 12px', marginRight: '5px' }}
                       >
                         View
                       </button>
@@ -100,7 +99,6 @@ function InvoiceList({ customerId }) {
                         <button
                           onClick={() => handlePayInvoice(invoice.invoice_id)}
                           className="btn btn-success"
-                          style={{ fontSize: '12px', padding: '6px 12px' }}
                         >
                           Pay Now
                         </button>
