@@ -180,7 +180,6 @@ VALUES
  (SELECT mechanic_id FROM mechanics WHERE email='david.chen@garage.com'),
  CURRENT_DATE + INTERVAL '1 day', '09:00', 'scheduled');
 
--- Create an invoice for the completed booking
 INSERT INTO invoices (booking_id, customer_id, invoice_number, subtotal, tax, total, payment_status, payment_method, invoice_date)
 VALUES (
  (SELECT booking_id FROM bookings WHERE booking_date = CURRENT_DATE - INTERVAL '1 day' AND status='completed' LIMIT 1),
